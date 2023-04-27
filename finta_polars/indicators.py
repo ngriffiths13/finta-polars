@@ -58,19 +58,30 @@ def _get_ohlcv_columns(ohlc_df: pl.LazyFrame) -> list[str]:
 def _apply_expr(
     ohlcv_df: pl.LazyFrame,
     ohlcv_columns: list[str],
-    expr: pl.Expr,
+    expr: pl.Expr | list[pl.Expr],
     identifier_column,
     suffix: str,
 ) -> pl.LazyFrame:
+    """Apply an expression to a dataframe."""
+    if identifier_column is not None:
+        if isinstance(expr, list):
+            expr = [e.over(identifier_column) for e in expr]
+        else:
+            expr = expr.over(identifier_column)
+    if isinstance(expr, list):
+        expr = [e.suffix(suffix) for e in expr]
+    else:
+        expr = [expr.suffix(suffix)]
+
     if identifier_column is None:
         return ohlcv_df.select(
             pl.all().exclude(ohlcv_columns),
-            expr.suffix(suffix),
+            *expr,
         )
     else:
         return ohlcv_df.select(
             pl.all().exclude(ohlcv_columns),
-            expr.over(identifier_column).suffix(suffix),
+            *expr,
         )
 
 
@@ -279,3 +290,40 @@ def bbands(
             This makes it convenient to join commands.
     """
     ...
+
+
+def macd(
+    ohlc_df: pl.LazyFrame,
+    fast_period: int = 12,
+    slow_period: int = 26,
+    signal_period: int = 9,
+    identifier_column: str | None = None,
+) -> pl.LazyFrame:
+    """Calculates the moving average convergence divergence.
+
+    Args:
+        ohlc_df (pl.LazyFrame): Dataframe containing the OHLC data.
+            Volume can optionally be included.
+        fast_period (int, optional): Period to use for the fast moving average.
+            Defaults to 12.
+        slow_period (int, optional): Period to use for the slow moving average.
+            Defaults to 26.
+        signal_period (int, optional): Period to use for the signal line.
+            Defaults to 9.
+        identifier_column (str, optional): Column to use as an identifier of instrument
+            in the dataframe. Defaults to None. If None, the dataframe is assumed to
+            contain data for only one instrument.
+
+    Returns:
+        pl.LazyFrame: Dataframe containing the moving average convergence divergence.
+            Other columns are returned as they were given.
+            This makes it convenient to join commands.
+    """
+    suffix = f"_macd_{fast_period}_{slow_period}"
+    columns = OHLC_COLUMNS
+    expr = [
+        pl.col(col).rolling_mean(slow_period) - pl.col(col).rolling_mean(fast_period)
+        for col in columns
+    ]
+    out = _apply_expr(ohlc_df, columns, expr, identifier_column, suffix)
+    return out  # TODO: Add a 9 day EMA of the MACD
