@@ -20,6 +20,8 @@ ruff = "^0.0.263"
 pre-commit = "^3.2.2"
 pyarrow = "^11.0.0"
 pytest-cov = "^4.0.0"
+pandas-ta = "^0.3.14b0"
+ta-lib = "^0.4.26"
 
 [tool.ruff]
 select = ["E", "F", "I", "N", "D", "RUF"]

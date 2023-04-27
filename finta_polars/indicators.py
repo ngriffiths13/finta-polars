@@ -292,6 +292,7 @@ def bbands(
     ...
 
 
+@make_lazy
 def macd(
     ohlc_df: pl.LazyFrame,
     fast_period: int = 12,
@@ -322,8 +323,13 @@ def macd(
     suffix = f"_macd_{fast_period}_{slow_period}"
     columns = OHLC_COLUMNS
     expr = [
-        pl.col(col).rolling_mean(slow_period) - pl.col(col).rolling_mean(fast_period)
+        pl.col(col).ewm_mean(span=slow_period) - pl.col(col).ewm_mean(span=fast_period)
         for col in columns
     ]
     out = _apply_expr(ohlc_df, columns, expr, identifier_column, suffix)
-    return out  # TODO: Add a 9 day EMA of the MACD
+    return out.with_columns(
+        [
+            pl.col(c + suffix).ewm_mean(span=signal_period).suffix("_signal")
+            for c in columns
+        ]
+    )

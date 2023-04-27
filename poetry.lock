@@ -440,6 +440,24 @@ test = ["hypothesis (>=6.34.2)", "pytest (>=7.0.0)", "pytest-asyncio (>=0.17.0)"
 xml = ["lxml (>=4.6.3)"]
 
 [[package]]
+name = "pandas-ta"
+version = "0.3.14b"
+description = "An easy to use Python 3 Pandas Extension with 130+ Technical Analysis Indicators. Can be called from a Pandas DataFrame or standalone like TA-Lib. Correlation tested with TA-Lib."
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pandas_ta-0.3.14b.tar.gz", hash = "sha256:0fa35aec831d2815ea30b871688a8d20a76b288a7be2d26cc00c35cd8c09a993"},
+]
+
+[package.dependencies]
+pandas = "*"
+
+[package.extras]
+dev = ["alphaVantage-api", "matplotlib", "mplfinance", "scipy", "sklearn", "statsmodels", "stochastic", "talib", "tqdm", "vectorbt", "yfinance"]
+test = ["ta-lib"]
+
+[[package]]
 name = "pathspec"
 version = "0.11.1"
 description = "Utility library for gitignore style pattern matching of file paths."
@@ -782,6 +800,20 @@ files = [
 ]
 
 [[package]]
+name = "ta-lib"
+version = "0.4.26"
+description = "Python wrapper for TA-Lib"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "TA-Lib-0.4.26.tar.gz", hash = "sha256:9a1e87ead8990f5c344184e17f268b4f6f50532ea9d40fb7fd161ce5197716da"},
+]
+
+[package.dependencies]
+numpy = "*"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -841,4 +873,4 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.3)", "coverage-enable-subprocess
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10"
-content-hash = "94be418a77c75906d5b476124e41af53124f47617b588845a03de4fe464bbf2e"
+content-hash = "f34879425aa737cab2ceafcccb117d3e0805c4f338ca2bfca853ac039811f2de"
