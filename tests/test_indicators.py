@@ -1,10 +1,11 @@
 """Tests for indicator functions."""
 import polars as pl
 import pytest
+
 from finta_polars.indicators import (
+    moving_std,
     simple_moving_average,
     simple_moving_median,
-    moving_std,
 )
 
 

@@ -3,6 +3,8 @@
 This module contains all the functions used to calculate the
 various technical indicators supported.
 """
+from typing import Callable
+
 import polars as pl
 
 from finta_polars.schemas import validate_indicator_schema
@@ -160,3 +162,120 @@ def moving_std(
     columns = _get_ohlcv_columns(ohlc_df)
     expr = pl.col(columns).rolling_std(period)
     return _apply_expr(ohlc_df, columns, expr, identifier_column, suffix)
+
+
+@make_lazy
+def exponential_moving_average(
+    ohlc_df: pl.LazyFrame,
+    period: int = 20,
+    identifier_column: str | None = None,
+) -> pl.LazyFrame:
+    """Calculates the exponential moving average of a dataframe.
+
+    This requires the DataFrame to already be sorted upon calling this function.
+
+    Args:
+        ohlc_df (pl.LazyFrame): Dataframe containing the OHLC data.
+            Volume can optionally be included.
+        period (int, optional): Period to use for the exponential moving average.
+            Defaults to 20.
+        identifier_column (str, optional): Column to use as an identifier of instrument
+            in the dataframe. Defaults to None. If None, the dataframe is assumed to
+            contain data for only one instrument.
+
+    Returns:
+        pl.LazyFrame: Dataframe containing the exponential moving average of all OHLCV
+            columns. Other columns are returned as they were given.
+            This makes it convenient to join commands.
+    """
+    ...
+
+
+@make_lazy
+def typical_price(
+    ohlc_df: pl.LazyFrame,
+) -> pl.LazyFrame:
+    """Calculate the typical price defined as the arithmetic mean of high low and close.
+
+    Args:
+        ohlc_df (pl.LazyFrame): Dataframe containing the OHLC data.
+
+    Returns:
+        pl.LazyFrame: Dataframe containing the typical price.
+            Other columns are returned as they were given.
+            This makes it convenient to join commands.
+    """
+    ...
+
+
+@make_lazy
+def vwap(
+    ohlcv_df: pl.LazyFrame,
+) -> pl.LazyFrame:
+    """Calculates the volume weighted average price.
+
+    Args:
+        ohlcv_df (pl.LazyFrame): Dataframe containing the OHLCV data.
+
+    Returns:
+        pl.LazyFrame: Dataframe containing the volume weighted average price.
+            Other columns are returned as they were given.
+            This makes it convenient to join commands.
+    """
+    ...
+
+
+@make_lazy
+def rsi(
+    ohlc_df: pl.LazyFrame,
+    period: int = 14,
+    identifier_column: str | None = None,
+) -> pl.LazyFrame:
+    """Calculates the relative strength index.
+
+    Args:
+        ohlc_df (pl.LazyFrame): Dataframe containing the OHLC data.
+            Volume can optionally be included.
+        period (int, optional): Period to use for the relative strength index.
+            Defaults to 14.
+        identifier_column (str, optional): Column to use as an identifier of instrument
+            in the dataframe. Defaults to None. If None, the dataframe is assumed to
+            contain data for only one instrument.
+
+    Returns:
+        pl.LazyFrame: Dataframe containing the relative strength index.
+            Other columns are returned as they were given.
+            This makes it convenient to join commands.
+    """
+    ...
+
+
+@make_lazy
+def bbands(
+    ohlc_df: pl.LazyFrame,
+    period: int = 20,
+    std: float = 2.0,
+    identifier_column: str | None = None,
+    ma_func: Callable[[pl.Series], pl.Series] = simple_moving_average,
+) -> pl.LazyFrame:
+    """Calculates the bollinger bands.
+
+    Args:
+        ohlc_df (pl.LazyFrame): Dataframe containing the OHLC data.
+            Volume can optionally be included.
+        period (int, optional): Period to use for the bollinger bands.
+            Defaults to 20.
+        std (float, optional): Standard deviation to use for the bollinger bands.
+            Defaults to 2.0.
+        identifier_column (str, optional): Column to use as an identifier of instrument
+            in the dataframe. Defaults to None. If None, the dataframe is assumed to
+            contain data for only one instrument.
+        ma_func (Callable[[pl.Series], pl.Series], optional): Function to use for
+            calculating the moving average. Defaults to simple_moving_average.
+
+    Returns:
+        pl.LazyFrame: Dataframe containing the bollinger bands.
+            Other columns are returned as they were given.
+            This makes it convenient to join commands.
+    """
+    ...

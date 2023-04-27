@@ -1,9 +1,12 @@
 test:
-    nox -s test
+    poetry run nox -s test
 
 benchmark:
-    nox -s benchmark
+    poetry run nox -s benchmark
 
 lint:
-    black .
-    ruff . --fix
+    poetry run black .
+    poetry run ruff . --fix
+
+pre-commit:
+    poetry run pre-commit run --all
