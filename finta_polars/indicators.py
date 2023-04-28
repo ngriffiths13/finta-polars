@@ -199,7 +199,10 @@ def exponential_moving_average(
             columns. Other columns are returned as they were given.
             This makes it convenient to join commands.
     """
-    ...
+    suffix = f"_ema_{period}"
+    columns = _get_ohlcv_columns(ohlc_df)
+    expr = pl.col(columns).ewm_mean(span=period)
+    return _apply_expr(ohlc_df, columns, expr, identifier_column, suffix)
 
 
 @make_lazy
