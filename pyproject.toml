@@ -76,12 +76,11 @@ convention = "google"
 
 [tool.pytest.ini_options]
 testpaths = 'tests'
-# min, max, mean, stddev, median, iqr, outliers, ops, rounds, iterations
 addopts = [
-    '--benchmark-columns', 'min,mean,stddev,outliers,rounds,iterations',
+    '--benchmark-columns', 'mean,stddev,rounds',
     '--benchmark-group-by', 'group',
     '--benchmark-warmup', 'on',
-    '--benchmark-disable',  # this is enable by `make benchmark` when you actually want to run benchmarks
+    '--benchmark-disable',  # this is enabled by nox when you want to run benchmarks
 ]
 
 [build-system]
