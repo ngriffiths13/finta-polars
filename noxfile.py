@@ -26,9 +26,11 @@ def test(session: Session) -> None:
         "pytest",
         "--junitxml=pytest.xml",
         "--cov=finta_polars",
+        "--cov-report=xml:coverage.xml",
         "-v",
         "-m",
-        " not benchmark",
+        "not benchmark",
+        "tests/",
     )
 
 

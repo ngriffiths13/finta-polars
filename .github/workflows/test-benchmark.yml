@@ -10,6 +10,11 @@ jobs:
           python-version: '3.10'
       - run: pip install nox
       - run: nox --session test
+      - name: Pytest coverage comment
+        uses: MishaKav/pytest-coverage-comment@main
+        with:
+          pytest-xml-coverage-path: ./coverage.xml
+          junitxml-path: ./pytest.xml
   run-benchmarks:
     runs-on: ubuntu-latest
     steps:
