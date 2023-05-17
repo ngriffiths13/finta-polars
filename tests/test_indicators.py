@@ -3,6 +3,7 @@ import polars as pl
 import pytest
 
 from finta_polars.indicators import (
+    typical_price,
     exponential_moving_average,
     moving_std,
     simple_moving_average,
@@ -148,3 +149,33 @@ def test_simple_moving_std_multiple_companies(ohlcv_df_multiple_companies):
 #         "close_ema_5",
 #         "volume_ema_5",
 #     ]
+
+
+def test_typical_price_no_volume(ohlcv_df):
+    ohlc_df = ohlcv_df.drop("volume")
+    out = typical_price(ohlc_df).collect()
+    assert out.shape == (3000, 5)
+    assert out.select(pl.last("typical_price")).item() == 2999
+    assert out.columns == ["open", "high", "low", "close", "typical_price"]
+
+
+def test_typical_price_volume(ohlcv_df):
+    out = typical_price(ohlcv_df).collect()
+    assert out.shape == (3000, 6)
+    assert out.select(pl.last("typical_price")).item() == 2999
+    assert out.columns == ["open", "high", "low", "close", "volume", "typical_price"]
+
+
+def test_typical_price_multiple_companies(ohlcv_df_multiple_companies):
+    out = typical_price(ohlcv_df_multiple_companies).collect()
+    assert out.shape == (15000, 7)
+    assert out.select(pl.last("typical_price")).item() == 2999
+    assert out.columns == [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "ticker",
+        "typical_price",
+    ]
