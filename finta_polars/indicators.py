@@ -55,6 +55,18 @@ def _get_ohlcv_columns(ohlc_df: pl.LazyFrame) -> list[str]:
     return columns
 
 
+def _add_identifier_over_to_expr(
+    expr: pl.Expr | list[pl.Expr],
+    identifier_column: str | None,
+) -> list[pl.Expr]:
+    """Add an identifier column to an expression."""
+    if not isinstance(expr, list):
+        expr = [expr]
+    if identifier_column is not None:
+        expr = [e.over(identifier_column) for e in expr]
+    return expr
+
+
 def _apply_expr(
     ohlcv_df: pl.LazyFrame,
     ohlcv_columns: list[str],
@@ -63,26 +75,13 @@ def _apply_expr(
     suffix: str,
 ) -> pl.LazyFrame:
     """Apply an expression to a dataframe."""
-    if identifier_column is not None:
-        if isinstance(expr, list):
-            expr = [e.over(identifier_column) for e in expr]
-        else:
-            expr = expr.over(identifier_column)
-    if isinstance(expr, list):
-        expr = [e.suffix(suffix) for e in expr]
-    else:
-        expr = [expr.suffix(suffix)]
+    expr = _add_identifier_over_to_expr(expr, identifier_column)
+    expr = [e.suffix(suffix) for e in expr]
 
-    if identifier_column is None:
-        return ohlcv_df.select(
-            pl.all().exclude(ohlcv_columns),
-            *expr,
-        )
-    else:
-        return ohlcv_df.select(
-            pl.all().exclude(ohlcv_columns),
-            *expr,
-        )
+    return ohlcv_df.select(
+        pl.all().exclude(ohlcv_columns),
+        *expr,
+    )
 
 
 @make_lazy
@@ -330,9 +329,7 @@ def macd(
         for col in columns
     ]
     out = _apply_expr(ohlc_df, columns, expr, identifier_column, suffix)
-    return out.with_columns(
-        [
-            pl.col(c + suffix).ewm_mean(span=signal_period).suffix("_signal")
-            for c in columns
-        ]
-    )
+    expr = [pl.col(c + suffix).ewm_mean(span=signal_period) for c in columns]
+    expr = _add_identifier_over_to_expr(expr, identifier_column)
+    expr = [e.suffix("_signal") for e in expr]
+    return out.with_columns(expr)

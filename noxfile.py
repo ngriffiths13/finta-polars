@@ -22,4 +22,20 @@ def test(session: Session) -> None:
         "pyarrow",
         ".",
     )
-    session.run("pytest", "--cov=finta_polars", "-v", "-m", " not benchmark")
+    session.run(
+        "pytest",
+        "--junitxml=pytest.xml",
+        "--cov=finta_polars",
+        "--cov-report=xml:coverage.xml",
+        "-v",
+        "-m",
+        "not benchmark",
+        "tests/",
+    )
+
+
+@session(python="3.10")
+def lint(session: Session) -> None:
+    """Lint repo."""
+    session.install("ruff")
+    session.run("ruff", ".")
