@@ -218,7 +218,8 @@ def typical_price(
             Other columns are returned as they were given.
             This makes it convenient to join commands.
     """
-    ...
+    tp = ohlc_df.select(((pl.col('high')+pl.col('low')+pl.col('close'))/3).alias('typical_price'))
+    return tp
 
 
 @make_lazy
