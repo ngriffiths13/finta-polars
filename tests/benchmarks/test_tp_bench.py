@@ -16,8 +16,7 @@ def test_typical_price_all_prices_multiple_companies_polars(
     ohlcv_df_multiple_companies, benchmark
 ):
     """Test that the typical price is correct."""
-    tp = typical_price(
-        ohlcv_df_multiple_companies)
+    tp = typical_price(ohlcv_df_multiple_companies)
     benchmark(tp.collect)
 
 
