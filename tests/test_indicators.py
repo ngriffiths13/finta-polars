@@ -154,20 +154,28 @@ def test_simple_moving_std_multiple_companies(ohlcv_df_multiple_companies):
 def test_typical_price_no_volume(ohlcv_df):
     ohlc_df = ohlcv_df.drop("volume")
     out = typical_price(ohlc_df).collect()
-    assert out.shape == (3000, 1)
+    assert out.shape == (3000, 5)
     assert out.select(pl.last("typical_price")).item() == 2999
-    assert out.columns == ["typical_price"]
+    assert out.columns == ["open", "high", "low", "close", "typical_price"]
 
 
 def test_typical_price_volume(ohlcv_df):
     out = typical_price(ohlcv_df).collect()
-    assert out.shape == (3000, 1)
+    assert out.shape == (3000, 6)
     assert out.select(pl.last("typical_price")).item() == 2999
-    assert out.columns == ["typical_price"]
+    assert out.columns == ["open", "high", "low", "close", "volume", "typical_price"]
 
 
 def test_typical_price_multiple_companies(ohlcv_df_multiple_companies):
     out = typical_price(ohlcv_df_multiple_companies).collect()
-    assert out.shape == (15000, 1)
+    assert out.shape == (15000, 7)
     assert out.select(pl.last("typical_price")).item() == 2999
-    assert out.columns == ["typical_price"]
+    assert out.columns == [
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "ticker",
+        "typical_price",
+    ]
