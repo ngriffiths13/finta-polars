@@ -7,6 +7,7 @@ from typing import Callable
 
 import polars as pl
 
+from finta_polars.expressions import ma_expr
 from finta_polars.schemas import validate_indicator_schema
 
 OHLC_COLUMNS = ["open", "high", "low", "close"]
@@ -108,10 +109,10 @@ def simple_moving_average(
             Other columns are returned as they were given.
             This makes it convenient to join commands.
     """
-    suffix = f"_sma_{period}"
     columns = _get_ohlcv_columns(ohlc_df)
-    expr = pl.col(columns).rolling_mean(period)
-    return _apply_expr(ohlc_df, columns, expr, identifier_column, suffix)
+    return ohlc_df.select(
+        ma_expr(columns, period, None, identifier_column, f"_sma_{period}")
+    )
 
 
 @make_lazy
